@@ -15,11 +15,22 @@ def login():
     # === Estilos CSS ===
     st.markdown("""
         <style>
-        .login-container {
+        .login-outer-container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 15vh;
+            height: 35vh;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            color: #ffffff;
+            background-color: #00cc66;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
         }
 
         .login-box {
@@ -59,7 +70,8 @@ def login():
         }
         </style>
 
-        <div class="login-container">
+        <div class="login-outer-container">
+            <div class="main-title">🗂️ CONTROL DE INVENTARIO</div>
             <div class="login-box">
                 <div class="login-title">🔐 Inicio de sesión</div>
     """, unsafe_allow_html=True)
