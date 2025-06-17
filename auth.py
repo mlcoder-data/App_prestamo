@@ -87,6 +87,11 @@ def login():
             st.rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
+    if usuario in usuarios_autorizados and usuarios_autorizados[usuario] == contraseña:
+        st.session_state.usuario = usuario
+        st.session_state.is_admin = True if usuario in ["Mateo", "Juliana"] else False
+        st.success(f"Sesión iniciada como {usuario}")
+        st.rerun()
 
     st.markdown("</div></div>", unsafe_allow_html=True)
     return False
