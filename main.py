@@ -42,7 +42,7 @@ def crear_tabla():
     conn.close()
 
 def registrar_evento(nombre, area, salon, accion, fecha_hora):
-    conn = sqlite3.connect("data/llaves.db")
+    conn = sqlite3.connect("llaves.db")
     cursor = conn.cursor()
     cursor.execute("INSERT INTO llaves (nombre, area, salon, accion, fecha_hora) VALUES (?, ?, ?, ?, ?)",
                    (nombre, area, salon, accion, fecha_hora))
@@ -93,6 +93,28 @@ def eliminar_registro(registro_id):
     conn.commit()
     conn.close()
 
+def procesar_fechas(df):
+    if not df.empty and 'fecha_hora' in df.columns:
+        df['fecha_hora'] = pd.to_datetime(df['fecha_hora'], errors='coerce')
+        df['día_semana'] = df['fecha_hora'].dt.day_name()
+        df['fecha'] = df['fecha_hora'].dt.date
+        df['hora'] = df['fecha_hora'].dt.hour
+    return df
+
+def filtros_comunes(df, key_prefix="filtro"):
+    # Asegurar que la columna 'día_semana' exista
+    if 'fecha_hora' in df.columns and 'día_semana' not in df.columns:
+        df['fecha_hora'] = pd.to_datetime(df['fecha_hora'], errors='coerce')
+        df['día_semana'] = df['fecha_hora'].dt.day_name()
+        df['fecha'] = df['fecha_hora'].dt.date
+        df['hora'] = df['fecha_hora'].dt.hour
+
+    profesores = ["Todos"] + sorted(df['nombre'].unique().tolist())
+    salones = ["Todos"] + sorted(df['salon'].unique().tolist())
+    areas = ["Todos"] + sorted(df['area'].unique().tolist())
+    dias = ["Todos"] + sorted(df['día_semana'].unique().tolist()) if 'día_semana' in df.columns else ["Todos"]
+
+    # ... el resto igual
 
 # === Fin database.py ===
 crear_tabla()
@@ -134,12 +156,9 @@ with st.sidebar:
         icons=["pencil-square", "clock-history", "bar-chart", "boxes", "key"]
     )
 
-data = obtener_historial()
-if not data.empty:
-    data['fecha_hora'] = pd.to_datetime(data['fecha_hora'])
-    data['día_semana'] = data['fecha_hora'].dt.day_name()
-    data['fecha'] = data['fecha_hora'].dt.date
-    data['hora'] = data['fecha_hora'].dt.hour
+data = procesar_fechas(obtener_historial())
+df_filtrado = filtros_comunes(data.copy(), key_prefix="todo")
+
 
 # Tabs para dividir visualizaciones EN EL HISTORIAL
 if choice == "Estadísticas":
